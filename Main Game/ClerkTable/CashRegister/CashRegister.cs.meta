@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: e4982375ab028b349b7ebba176efa0b6
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - notaDeUm: {fileID: 1538476341464060095, guid: 464c798077ff6904a94da9c4dcb6af1a,
+      type: 3}
+  - notaDeCinco: {fileID: 2651927179572584740, guid: 3ab04245d1de7184bad9865bd65a6d10,
+      type: 3}
+  - notaDeDez: {fileID: 5524871651378544301, guid: dece264ffcdd84944aaab7832a57e7e7,
+      type: 3}
+  - notaDeCinquenta: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
