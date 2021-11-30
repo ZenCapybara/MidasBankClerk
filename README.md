@@ -1,5 +1,10 @@
 # MidasBankClerk
-Site criado para laboratório de psicologia cognitiva da UFMG em 2008 (apenas HTML).
-Primeiro contato com alguma espécie de código.
+Projeto de jogo com a ZenCapibara. 
+C#, Unity. 
+Apenas arquivos .CS (C Sharp) e .meta
+
+Game project with ZenCapibara
+C#, Unity
+Only .CS (CSharp) and .meta files.
 
 ![alt text](https://github.com/MadsenAMS/MidasBankClerk/blob/main/accountant.png)
