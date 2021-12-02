@@ -29,6 +29,7 @@ public class ClientCueMechanics : MonoBehaviour
         {
             if (cliente.trueAccountNumber == accountNumber)
             {
+                ClientAccessedOnPc = cliente;
                 return cliente;
             }
         }
@@ -41,6 +42,7 @@ public class ClientCueMechanics : MonoBehaviour
         {
             if (cliente.trueIdentityNumber == idNumber)
             {
+                ClientAccessedOnPc = cliente;
                 return cliente;
             }
         }

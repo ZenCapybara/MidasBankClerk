@@ -4,23 +4,20 @@ public static class DialogoDemandaConcluida
 {
     private static readonly string[] BemHumorado =
     {
-        "Muito bom! Por hoje é só!",
-        "Bom o atendimento! Depois eu volto!",
-        "Ok! Eu só precisava disso! Até mais!"
+        "Gostei do atendimento. Obrigado (PLACEHOLDER1 - Humor Bom)",
+        "Gostei do atendimento. Obrigado (PLACEHOLDER2 - Humor Bom)"
     };
 
     private static readonly string[] Neutro =
     {
-        "Era só isso. Até a próxima.",
-        "Era só isso. Vou embora.",
-        "Hmmm... Tchau então."
+        "Já tenho o que queria. Obrigado (PLACEHOLDER1 - Humor Neutro)",
+        "Já tenho o que queria. Obrigado (PLACEHOLDER2 - Humor Neutro)"
     };
 
     private static readonly string[] MalHumorado =
 {
-        "Vou tentar voltar outra hora. Quem sabe pego outra pessoa no caixa.",
-        "Que atendimento mediocre. Vou embora.",
-        "Eu devia ter usado o banheiro e ido embora."
+        "Péssimo atendimento. Vou embora (PLACEHOLDER1 - Humor Ruim)",
+        "Péssimo atendimento. Vou embora (PLACEHOLDER2 - Humor Ruim)"
     };
 
     public static string GetDialogo(int humor)

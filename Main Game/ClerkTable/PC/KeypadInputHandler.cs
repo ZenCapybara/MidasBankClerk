@@ -3,15 +3,20 @@ using UnityEngine;
 public class KeypadInputHandler : MonoBehaviour
 {
     MidasOS pcScript;
+    AudioSource audioSource;
+    public AudioClip[] keyboardClicks;
 
     // Start is called before the first frame update
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         pcScript = ScriptFinder.Get<MidasOS>();
     }
 
     public void KeyHandler(string input)
     {
+        audioSource.clip = keyboardClicks[Random.Range(0, keyboardClicks.Length)];
+        audioSource.Play();
         pcScript.PCInputDistributor(input);
     }
 

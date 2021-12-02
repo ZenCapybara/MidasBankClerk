@@ -78,7 +78,7 @@ public abstract class TableTopMovebleObject : Clickable
 
     protected bool CheckIfDroppedOverCashRegister()
     {
-        if (transform.position.x < 1100 && transform.position.y < 350)
+        if (Input.mousePosition.x < 1250 && Input.mousePosition.y < 325)
             return true;
 
         return false;
@@ -86,7 +86,7 @@ public abstract class TableTopMovebleObject : Clickable
 
     protected bool CheckIfDroppedOverClientDeliveryArea()
     {
-        if (transform.position.x < 1430 && transform.position.y > 500)
+        if (Input.mousePosition.x < 1450 && Input.mousePosition.y > 375)
             return true;
 
         return false;

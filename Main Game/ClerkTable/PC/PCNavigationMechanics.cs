@@ -7,7 +7,6 @@ public class PCNavigationMechanics : MonoBehaviour
     {
         Idle,
         ChooseService,
-        ChoseClientIDMethod,
         WaitingForClientBankCard,
         ClientIDCardRequest,
         ClientIdentified,
@@ -31,7 +30,6 @@ public class PCNavigationMechanics : MonoBehaviour
 
                     new IdleState(),
                     new ChoseServiceState(),
-                    new ChoseClientIDMethodState(),
                     new WaintingForClientBankCardState(),
                     new ClientIDCardRequestState(),
                     new ClientIdentifiedState(),
@@ -46,19 +44,22 @@ public class PCNavigationMechanics : MonoBehaviour
     public void PCStateChangeAndAdvanceToStateOnTaskReturn(PCStateCode nextState, PCStateCode returnToThisState)
     {
         if (pcPreviousState.Count > 1)
-            pcPreviousState.RemoveAt(pcPreviousState.Count - 1);
+            ForgetPreviousState();
 
         pcPreviousState.Add(returnToThisState);
 
         PCStateChange(nextState);
-
     }
 
     //Sobrecarga utiliza o estado do pc que chama a função como tela de retorno de navegação.
-    public void PCStateChangeAndRememberMe(PCStateCode nextState)
+    public void RememberMe()
     {
         pcPreviousState.Add(pcCurrentState);
-        PCStateChange(nextState);
+    }
+
+    public void ForgetPreviousState()
+    {
+        pcPreviousState.RemoveAt(pcPreviousState.Count - 1);
     }
 
     public void PCStateChange(PCStateCode nextState)
@@ -67,12 +68,21 @@ public class PCNavigationMechanics : MonoBehaviour
         pcScreen.Write(pcStates[(int)nextState].Evoke());
     }
 
+    public PCStateCode GetPreviousState(int indexJump = 1)
+    {
+        for(int i = 1; i < indexJump; i++)
+        {
+            pcPreviousState.RemoveAt(pcPreviousState.Count - 1);
+        }
+        return pcPreviousState[pcPreviousState.Count - indexJump];
+    }
+
     public void ReturnToPreviousState()
     {
-        pcScreen.Write(pcStates[(int)pcPreviousState[pcPreviousState.Count - 1]].Evoke());
         pcCurrentState = pcPreviousState[pcPreviousState.Count - 1];
+        pcScreen.Write(pcStates[(int)pcCurrentState].Evoke());
         if (pcPreviousState.Count > 1)
-            pcPreviousState.RemoveAt(pcPreviousState.Count - 1);
+                ForgetPreviousState();
     }
 
     public void LaunchErrorMessage(string errorMessage = "\n\n\n\n")

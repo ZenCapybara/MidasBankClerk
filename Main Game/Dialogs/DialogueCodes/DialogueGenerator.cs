@@ -131,6 +131,7 @@ public class DialogueGenerator : MonoBehaviour
         for (int i = 0; i < 4; i++)
         {
             publishedDialogue[i].Text = "";
+            dialogueBoxes[i].GetComponentInChildren<Text>().text = "";
             dialogueBoxes[i].SetActive(false);
         }
         numberOfDialogueEntries = 0;

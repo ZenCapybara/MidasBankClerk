@@ -1,4 +1,3 @@
-using UnityEngine;
 using UnityEngine.UI;
 
 public class ClientIdentifiedState : PCState
@@ -10,14 +9,11 @@ public class ClientIdentifiedState : PCState
 
         pcInputField.SetActive(false);
 
-        Client accountOwnerInfo =
-                GameObject.Find("GameMechanicScripts")
-                .GetComponent<ClientCueMechanics>()
-                .ClientAccessedOnPc;
+        Client accountOwnerInfo = ScriptFinder.Get<ClientCueMechanics>().ClientAccessedOnPc;
 
         if(accountOwnerInfo != null)
         {
-            indicadorClienteIdentificado.GetComponentInChildren<Text>().text = $"Cliente: {accountOwnerInfo.trueName + accountOwnerInfo.trueSurname}";
+            indicadorClienteIdentificado.GetComponentInChildren<Text>().text = $"Cliente: {accountOwnerInfo.trueName.ToUpper()} {accountOwnerInfo.trueSurname.ToUpper()}";
 
             return $"CLIENTE: " +
                    $"\nNome: {accountOwnerInfo.trueName} {accountOwnerInfo.trueSurname}" +

@@ -198,6 +198,7 @@ public class Client : MonoBehaviour
     public void EndDemand()
     {
         demandaAtendida = true;
+        demanda = -1;
         humor++;
     }
 

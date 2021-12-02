@@ -7,28 +7,30 @@ public static class DialogosDoSaque
 {
     private static string[] EstagioUmQueroSacar =
     {
+        "Preciso sacar dinheiro hoje.",
+        "Tenho que pagar uma conta urgente! Preciso retirar um dinheiro.",
+        "Meu chihuahua está doente, preciso de dinheiro para pagar o veterinário."
+            ,"Money, money, money!",
+        "Será que você pode sacar uma grana para mim?",
         "Quero sacar meu dinheiro, por favor.",
         "Isso não é um banco? Vim pegar dinheiro. Oras.",
         "Me dá dinheiro.",
-        "Estou com dificuldade de sacar no caixa eletrônico. Preciso de ajuda."
+        "Estou com dificuldade de sacar no caixa eletrônico. Preciso de ajuda.",
+        "Nesse mundo cão o dinheiro é meu irmão. Preciso fazer um saque!",
+        "Psiu! Vim sacar dinheiro, mas seja discreto."
     };
 
+    //Tomás, nessa do saque o programa vai substituir o $ pelo valor.
+    //Então coloca o $ na posição onde a pessoa fala o valor.
     private static string[] EstagioDoisValorDoSaque =
     {
-        "Hmmm, deixa eu pensar... dez pra mim... dez pra minha filha... Quero sacar $",
-        "Eu quero sacar $",
-        "Hmmm... Talvez seja melhor eu sacar logo $",
-        "Adivinha! Brincadeira. Quero sacar $",
-        "O de sempre! Que careta é essa? Você nunca lembra. Quero $"
+        "Quero sacar $ (PLACEHOLDER1)",
+        "Quero sacar $ (PLACEHOLDER2)"
     };
 
     private static string[] EstagioTresSaldoInsuficiente =
-{
-        "Que coisa... Achei que estava rico.",
-        "Hmmm... suspeito. Muito suspeito.",
-        "MEU DINHEIRO! O QUE ACONTECEU COM MEU AMADO DINHEIRO?",
-        "Macacos me mordam!",
-        "Hahaha, eu sei... Mas não custava tentar."
+    {
+        "Parece que estou sem sorte hoje... (PLACEHOLDER?:)",
     };
 
     public static string GetDialogue(int estagioDaDemanda)

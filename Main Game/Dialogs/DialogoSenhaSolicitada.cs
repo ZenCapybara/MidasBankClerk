@@ -4,23 +4,20 @@ public static class DialogoSenhaSolicitada
 {
     private static string[] AquiEstaMinhaSenha =
     {
-        "Hmmm... Suspeito. Olhe pro lado!",
-        "Claro! Adoro digitar senha!",
-        "Ai ai... Cada dia uma burocracia nova."
+        "Ok, vou digitar a senha. (PLACEHOLDER1)",
+        "Ok, vou digitar a senha. (PLACEHOLDER2)"
     };
 
     private static string[] ErreiMinhaSenha =
     {
-        "Uai... Eu podia jurar que era essa.",
-        "Eu sei, tava só testando.",
-        "Hmmm... E agora?"
+        "Errei minha senha. Quero tentar de novo. (PLACEHOLDER1)",
+        "Errei minha senha. Quero tentar de novo. (PLACEHOLDER2)"
     };
 
     private static string[] NaoSeiMinhaSenha =
     {
-        "Xiiiiiiii... Acho que comi minha senha.",
-        "A senha não era esse número no cartão? Então não sei.",
-        "Se eu soubesse a senha eu não ia vir no caixa pra isso."
+        "Esqueci minha senha. Não adianta tentar de novo. (PLACEHOLDER1)",
+        "Esqueci minha senha. Não adianta tentar de novo. (PLACEHOLDER1)"
     };
 
     /// <summary>

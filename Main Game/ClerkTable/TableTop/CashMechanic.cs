@@ -3,7 +3,7 @@
     // This var should be left public,
     // as it's value is definied in unity
     // editor (cashValue)
-    public string cashValue; 
+    public string cashValue;
 
     Client activeClient;
 
@@ -22,18 +22,18 @@
 
         if (CheckIfDroppedOverClientDeliveryArea())
         {
-            DeliverToClient();            
+            DeliverToClient();
         }
-
 
     }
 
     void DeliverToClient()
     {
-            activeClient = ScriptFinder.Get<ClientCueMechanics>().GetCurrentClient();
-                    if (activeClient == null) return;
+        activeClient = ScriptFinder.Get<ClientCueMechanics>().GetCurrentClient();
+        if (activeClient == null) return;
 
-            activeClient.DepositMoney(int.Parse(cashValue));
+        activeClient.DepositMoney(int.Parse(cashValue));
+        RemoveMe();
     }
 
 }

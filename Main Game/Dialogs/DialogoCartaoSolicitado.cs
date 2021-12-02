@@ -4,26 +4,42 @@ public static class DialogoCartaoSolicitado
 {
     private static string[] TenhoCartao =
     {
-        "Tá aqui meu cartão. Mas vou precisar dele de volta.",
-        "Hmmm... Suspeito. Está aqui. Mas estou de olho.",
-        "Aiaiai, que saco. Tá aqui meu cartão.",
-        "Meu cartão é platinum plus. Oiá só."
+        "Aqui está (PLACEHOLDER 1)",
+        "Aqui está (PLACEHOLDER 2)"
+    };
+
+    private static string[] CartaoInvalido =
+    {
+        "Ok, cartão inválido (PLACEHOLDER 1)",
+        "Ok, cartão inválido (PLACEHOLDER 2)"
     };
 
     private static string[] NaoTenhoCartao =
     {
-        "Xiii, meu cachorro comeu.",
-        "Hmmm, eu jurava que estava na bolsa. Não trouxe.",
-        "Jamais daria meu cartão para um desconhecido!",
-        "Hmmm... e se eu não quiser dar meu cartão?"
-};
+        "Estou sem cartão (PLACEHOLDER 1)",
+        "Estou sem cartão (PLACEHOLDER 2)"
 
-    static public string GetDialogue(bool haveCard)
+    };
+
+    /// <summary>
+    /// Tipo 1 - Aqui Está Meu Cartão, Tipo 2- Cartão Inválido, Tipo 3 - Esqueci Meu Cartão
+    /// </summary>
+    /// <param name="tipoDeDialogo"></param>
+    /// <returns></returns>
+    static public string GetDialogue(int tipoDeDialogo)
     {
-        if (haveCard)
+        switch (tipoDeDialogo)
         {
-            return TenhoCartao[Random.Range(0, TenhoCartao.Length - 1)];
+            case 1:
+                return TenhoCartao[Random.Range(0, TenhoCartao.Length - 1)];
+            case 2:
+                return CartaoInvalido[Random.Range(0, CartaoInvalido.Length - 1)];
+            case 3:
+                return NaoTenhoCartao[Random.Range(0, NaoTenhoCartao.Length - 1)];
+            default:
+                Debug.LogError("Solicitado Diálogo Inválido!");
+                return "Diálogo Inválido";
         }
-        return NaoTenhoCartao[Random.Range(0, NaoTenhoCartao.Length - 1)];
+
     }
 }

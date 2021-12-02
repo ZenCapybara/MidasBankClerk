@@ -58,14 +58,19 @@ public class DemandMechanics : MonoBehaviour
     {
         if (activeClient.portaCartao)
         {
-            Say(DialogoCartaoSolicitado.GetDialogue(true));
+            Say(DialogoCartaoSolicitado.GetDialogue(1));
             return true;
         }
         else
         {
-            Say(DialogoCartaoSolicitado.GetDialogue(false));
+            Say(DialogoCartaoSolicitado.GetDialogue(3));
             return false;
         }
+    }
+
+    public void InformCardIsInvalid()
+    {
+        Say(DialogoCartaoSolicitado.GetDialogue(2));
     }
 
     public bool RequestClientPassword()
@@ -119,11 +124,14 @@ public class DemandMechanics : MonoBehaviour
 
     public void RequestWithDrawValue()
     {
+
         if (activeClient.demanda == 0)
         {
-            Say(DialogosDoSaque.GetDialogue(2)
-                + activeClient.valorDesejadoParaSaqueOuDeposito
-                + ".");
+            string output =
+                DialogosDoSaque.GetDialogue(2).
+                Replace("$", "$" + activeClient.valorDesejadoParaSaqueOuDeposito.ToString() + ".");
+
+            Say(output);
         }
         else
         {
