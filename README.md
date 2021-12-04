@@ -1,4 +1,4 @@
-Game project with ZenCapibara
+ZenCapybara's first solid game project, due for release early 2022.
 C#, Unity
 Only .CS (CSharp) files.
 
