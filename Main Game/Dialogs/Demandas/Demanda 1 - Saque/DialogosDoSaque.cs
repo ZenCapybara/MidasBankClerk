@@ -33,6 +33,9 @@ public static class DialogosDoSaque
         "Parece que estou sem sorte hoje... (PLACEHOLDER?:)",
     };
 
+    /// <summary>
+    /// 1- Quero Sacar // 2- Valor do Saque // 3- Saldo Insuficiente
+    /// </summary>
     public static string GetDialogue(int estagioDaDemanda)
     {
         if (estagioDaDemanda == 1)

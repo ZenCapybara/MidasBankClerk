@@ -59,7 +59,8 @@ public class PCNavigationMechanics : MonoBehaviour
 
     public void ForgetPreviousState()
     {
-        pcPreviousState.RemoveAt(pcPreviousState.Count - 1);
+        if(pcPreviousState.Count > 1)
+            pcPreviousState.RemoveAt(pcPreviousState.Count - 1);
     }
 
     public void PCStateChange(PCStateCode nextState)

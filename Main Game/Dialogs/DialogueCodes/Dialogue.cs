@@ -7,12 +7,17 @@ public class Dialogue
         Undefiened // should be used only on unprinted dialogues.
     }
 
-    public Owner MyOwner { get; set; }
-    public string Text { get; set; }
+    public Owner MyOwner { get; }
+    public string Text { get; }
+    public string pcStandbyText { get; }
 
-    public Dialogue(Owner dialogueOwner)
+
+    public Dialogue(Owner dialogueOwner, string Text = "", string pcStandbyText = "")
     {
         MyOwner = dialogueOwner;
+        this.Text = Text;
+        this.pcStandbyText = pcStandbyText;
+
     }
 
 

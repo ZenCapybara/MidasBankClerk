@@ -1,140 +1,179 @@
 using UnityEngine.UI;
 using UnityEngine;
+using System.Collections.Generic;
 using static Dialogue;
 
 public class DialogueGenerator : MonoBehaviour
 {
-    private int numberOfDialogueEntries;
-    private Color lightColor;
-    private Color darkColor;
-    private Dialogue[] publishedDialogue;
-    private Dialogue newDialogueToPrint;
+    private int dialogueBoxPosition;
+    private Color clientBoxColor;
+    private Color clerkBoxColor;
+    private List<Dialogue> Dialogs;
+    private int dialogPointer = 0;
+    private DelayMechanic delayManager;
+    private bool isPrinting = false;
+    const float DELAY = 0.03f;
+    private float printDelayCountdown = DELAY;
+    private int currentLetterBeingPrinted;
 
     private GameObject[] dialogueBoxes;
 
     void Awake()
     {
-        lightColor =
+        Dialogs = new List<Dialogue>();
+        delayManager = ScriptFinder.Get<DelayMechanic>();
+        clientBoxColor =
+            GameObject.Find("TextoDeDialogo0").
+            GetComponent<Image>()
+            .color;
+
+        clerkBoxColor =
             GameObject.Find("TextoDeDialogo1").
             GetComponent<Image>()
             .color;
 
-        darkColor = 
-            GameObject.Find("TextoDeDialogo2").
-            GetComponent<Image>()
-            .color;
-
-        numberOfDialogueEntries = 0;
-        publishedDialogue = new Dialogue[4];
-        for (int i = 0; i < 4; i++)
-        {
-            publishedDialogue[i] = new Dialogue(Owner.Undefiened);
-            publishedDialogue[i].Text = "";
-        }
         dialogueBoxes = new GameObject[4];
         for (int i = 0; i < 4; i++)
         {
             dialogueBoxes[i] = GameObject.Find("TextoDeDialogo" + i);
             dialogueBoxes[i].SetActive(false);
         }
+
     }
 
-    public void ReceiveDialogue(Dialogue inputDialogue)
+    public void ReceiveDialogue(Dialogue inputDialogue, string delayMessage)
     {
-        newDialogueToPrint = inputDialogue;
-        ChooseDialoguePosition();
+        delayManager.RequestDelay(delayMessage);
+        Dialogs.Add(inputDialogue);
+
+        if (Dialogs.Count - 1 == dialogPointer)
+            StartPrintingDialogue();
     }
 
-    private void ChooseDialoguePosition()
+    public void FinishDialog()
     {
-        if (numberOfDialogueEntries < 4)
+        for (int i = 0; i < 4; i++)
         {
-            dialogueBoxes[numberOfDialogueEntries].SetActive(true);
-            ChooseDialoguePrintMethodByDialogueOwner(numberOfDialogueEntries);
+            dialogueBoxes[i].GetComponentInChildren<Text>().text = "";
+            dialogueBoxes[i].SetActive(false);
+        }
+
+        Dialogs.Clear();
+        dialogPointer = 0;
+    }
+
+    private void StartPrintingDialogue()
+    {
+        isPrinting = true;
+        currentLetterBeingPrinted = 0;
+
+        if (dialogPointer < 4)
+        {
+            dialogueBoxes[dialogPointer].SetActive(true);
+            dialogueBoxPosition = dialogPointer;
         }
         else
         {
             ScrollOverflowingDialogueBoxes();
-            ChooseDialoguePrintMethodByDialogueOwner(3);
+            dialogueBoxes[3].GetComponentInChildren<Text>().text = "";
+            dialogueBoxPosition = 3;
         }
-
+        ConfigureDialogueToOwnerSpecs();
     }
 
     private void ScrollOverflowingDialogueBoxes()
     {
         for (int i = 0; i < 3; i++)
         {
-            publishedDialogue[i].Text = publishedDialogue[i + 1].Text;
-            dialogueBoxes[i].GetComponentInChildren<Text>().text = publishedDialogue[i].Text;
-            publishedDialogue[i].MyOwner = publishedDialogue[i + 1].MyOwner;
+            int previousDialog = dialogPointer - 3 + i;
+            dialogueBoxes[i].GetComponentInChildren<Text>().text
+                = Dialogs[previousDialog].Text;
 
-
-            if(publishedDialogue[i].MyOwner == Owner.Clerk)
+            if (Dialogs[previousDialog].MyOwner == Owner.Clerk)
             {
-                ColorDialogueBox(darkColor, dialogueBoxes[i]);
+                ColorDialogueBox(clerkBoxColor, dialogueBoxes[i]);
+                //SetDialogueAlignment(Owner.Clerk, i);
             }
             else
             {
-                ColorDialogueBox(lightColor, dialogueBoxes[i]);
+                ColorDialogueBox(clientBoxColor, dialogueBoxes[i]);
+                //SetDialogueAlignment(Owner.Client, i);
             }
         }
 
-        publishedDialogue[3].Text = "";
-        dialogueBoxes[3].GetComponentInChildren<Text>().text = publishedDialogue[3].Text;
-        publishedDialogue[3].MyOwner = Owner.Undefiened;
-
     }
 
-    private void ChooseDialoguePrintMethodByDialogueOwner(int positionToPrintIn)
+    private void ConfigureDialogueToOwnerSpecs()
     {
-        publishedDialogue[positionToPrintIn].MyOwner = newDialogueToPrint.MyOwner;
-        publishedDialogue[positionToPrintIn].Text = newDialogueToPrint.Text;
-
-        if (newDialogueToPrint.MyOwner == Owner.Clerk)
+        if (Dialogs[dialogPointer].MyOwner == Owner.Clerk)
         {
-            ColorDialogueBox(darkColor, dialogueBoxes[positionToPrintIn]);
-            dialogueBoxes[positionToPrintIn].GetComponentInChildren<Text>().text = newDialogueToPrint.Text;
+            ColorDialogueBox(clerkBoxColor, dialogueBoxes[dialogueBoxPosition]);
+            //SetDialogueAlignment(Owner.Clerk, dialogueBoxPosition);
         }
-        else if (newDialogueToPrint.MyOwner == Owner.Client)
+        else if (Dialogs[dialogPointer].MyOwner == Owner.Client)
         {
-            ColorDialogueBox(lightColor, dialogueBoxes[positionToPrintIn]);
-            PrintDialogueLetterByLetterWithDelay(positionToPrintIn);
+            ColorDialogueBox(clientBoxColor, dialogueBoxes[dialogueBoxPosition]);
+            //SetDialogueAlignment(Owner.Client, dialogueBoxPosition);
         }
-        numberOfDialogueEntries++;
     }
 
     private void ColorDialogueBox(Color color, GameObject dialogueBox)
     {
-        if(color == darkColor)
+        if (color == clerkBoxColor)
         {
-            dialogueBox.GetComponent<Image>().color = darkColor;
-            dialogueBox.GetComponentInChildren<Text>().color = lightColor;
+            dialogueBox.GetComponent<Image>().color = clerkBoxColor;
         }
         else
         {
-            dialogueBox.GetComponent<Image>().color = lightColor;
-            dialogueBox.GetComponentInChildren<Text>().color = darkColor;
-        }
-
-    }
-
-    private void PrintDialogueLetterByLetterWithDelay(int positionToPrintIn)
-    {
-        foreach (char c in newDialogueToPrint.Text)
-        {
-            dialogueBoxes[positionToPrintIn].GetComponentInChildren<Text>().text += c;
+            dialogueBox.GetComponent<Image>().color = clientBoxColor;
         }
     }
+    //!!! ALSO UNCOMMENT CONFIGUREDIALOGUETOOWNERSPECS AND SCROLL
+    //private void SetDialogueAlignment(Owner owner, int dialogue)
+    //{
+    //    if (owner == Owner.Clerk)
+    //    {
+    //        dialogueBoxes[dialogue]
+    //            .GetComponentInChildren<Text>()
+    //            .alignment = TextAnchor.MiddleRight;
+    //    }
+    //    if (owner == Owner.Client)
+    //    {
+    //        dialogueBoxes[dialogue]
+    //            .GetComponentInChildren<Text>()
+    //            .alignment = TextAnchor.MiddleLeft;
+    //    }
+    //}
 
-    public void finishDialogue()
+    private void PrintDialogueLetterByLetterWithDelay()
     {
-        for (int i = 0; i < 4; i++)
+        printDelayCountdown -= Time.deltaTime;
+        if (printDelayCountdown > 0)
+            return;
+        if (currentLetterBeingPrinted < Dialogs[dialogPointer].Text.Length)
         {
-            publishedDialogue[i].Text = "";
-            dialogueBoxes[i].GetComponentInChildren<Text>().text = "";
-            dialogueBoxes[i].SetActive(false);
+            dialogueBoxes[dialogueBoxPosition].GetComponentInChildren<Text>().text
+                += Dialogs[dialogPointer].Text[currentLetterBeingPrinted];
+
+            printDelayCountdown = DELAY;
+            currentLetterBeingPrinted++;
         }
-        numberOfDialogueEntries = 0;
+        else if (printDelayCountdown < -1)
+        {
+            dialogPointer++;
+
+            delayManager.YieldDelay();
+            isPrinting = false;
+
+            if (dialogPointer < Dialogs.Count)
+                StartPrintingDialogue();
+        }
+    }
+
+    private void Update()
+    {
+        if (isPrinting)
+            PrintDialogueLetterByLetterWithDelay();
     }
 
 }

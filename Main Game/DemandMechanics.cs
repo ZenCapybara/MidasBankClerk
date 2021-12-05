@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class DemandMechanics : MonoBehaviour
 {
@@ -12,7 +13,6 @@ public class DemandMechanics : MonoBehaviour
 
     void Start()
     {
-        clientDialogue = new Dialogue(Dialogue.Owner.Client);
         outputDialogue = ScriptFinder.Get<DialogueGenerator>();
 
         //Capture Client Object Description Box (placeholder for actual object art)
@@ -22,55 +22,47 @@ public class DemandMechanics : MonoBehaviour
 
     }
 
-    /*********************************
-    *         Operacional
-    ********************************/
-    public void Say(string inputText)
+    //**************** Operacional *****************
+ 
+    public void Say(string inputText, string pcDelayMessage)
     {
-        clientDialogue.Text = inputText;
-        outputDialogue.ReceiveDialogue(clientDialogue);
+        clientDialogue = new Dialogue(Dialogue.Owner.Client, inputText, pcDelayMessage);
+        outputDialogue.ReceiveDialogue(clientDialogue, pcDelayMessage);
     }
 
     public void TerminarAtendimento()
     {
         if (!activeClient.demandaAtendida)
         {
-            Debug.Log("Cliente dispensado com demanda não-concluída");
             activeClient.ReduceMoodDueToBadService(10);
         }
         clientHandoverObjectPanel.SetActive(false);
-        Say(DialogoDemandaConcluida.GetDialogo(activeClient.humor));
+        Say(DialogoDemandaConcluida.GetDialogo(activeClient.humor), "Concluíndo Atendimento...");
     }
 
     public void ClientPresentation(Client nextClient)
     {
         activeClient = nextClient;
-        ScriptFinder.Get<DialogueGenerator>().finishDialogue();
-
-        //Roll for 70% chance of greeting
-        if (Random.Range(0, 10) < 7)
-        {
-            Say(CumprimentosTXT.getCumprimentos());
-        }
+        Say(CumprimentosTXT.getCumprimentos(), "Aguardando Cliente...");
     }
 
     public bool RequestClientCard()
     {
         if (activeClient.portaCartao)
         {
-            Say(DialogoCartaoSolicitado.GetDialogue(1));
+            Say(DialogoCartaoSolicitado.GetDialogue(1), "Aguardando Cartão do Cliente...");
             return true;
         }
         else
         {
-            Say(DialogoCartaoSolicitado.GetDialogue(3));
+            Say(DialogoCartaoSolicitado.GetDialogue(3), "Aguardando Cartão do Cliente...");
             return false;
         }
     }
 
     public void InformCardIsInvalid()
     {
-        Say(DialogoCartaoSolicitado.GetDialogue(2));
+        Say(DialogoCartaoSolicitado.GetDialogue(2), "Cartão Inválido!");
     }
 
     public bool RequestClientPassword()
@@ -80,14 +72,14 @@ public class DemandMechanics : MonoBehaviour
         {
             if (activeClient.remembersPassword)
             {
-                Say(DialogoSenhaSolicitada.GetDialogue(1));
+                Say(DialogoSenhaSolicitada.GetDialogue(1), "Aguardando senha...");
                 return true;
             }
-            Say(DialogoSenhaSolicitada.GetDialogue(3));
+            Say(DialogoSenhaSolicitada.GetDialogue(3), "Aguardando senha...");
             return false;
         }
         //senha incorreta
-        Say(DialogoSenhaSolicitada.GetDialogue(2));
+        Say(DialogoSenhaSolicitada.GetDialogue(2), "Aguardando senha...");
         return false;
 
     }
@@ -106,20 +98,20 @@ public class DemandMechanics : MonoBehaviour
     {
         if (activeClient.portaIdentidade)
         {
-            Say(DialogoRGSolicitado.GetDialogue(DialogoRGSolicitado.estadoDoRg.tenhoRG));
+            Say(DialogoRGSolicitado.GetDialogue(DialogoRGSolicitado.estadoDoRg.tenhoRG), "Carregando...");
             PresentID();
             return true;
         }
         else
         {
-            Say(DialogoRGSolicitado.GetDialogue(DialogoRGSolicitado.estadoDoRg.naoTenhoRG));
+            Say(DialogoRGSolicitado.GetDialogue(DialogoRGSolicitado.estadoDoRg.naoTenhoRG), "Carregando...");
             return false;
         }
     }
 
     public void RequestClientDesiredService()
     {
-        Say(DialogosDoSaque.GetDialogue(1));
+        Say(DialogosDoSaque.GetDialogue(1), "Carregando...");
     }
 
     public void RequestWithDrawValue()
@@ -131,12 +123,12 @@ public class DemandMechanics : MonoBehaviour
                 DialogosDoSaque.GetDialogue(2).
                 Replace("$", "$" + activeClient.valorDesejadoParaSaqueOuDeposito.ToString() + ".");
 
-            Say(output);
+            Say(output, "Carregando...");
         }
         else
         {
             activeClient.ReduceMoodDueToBadService();
-            Say(ErroNoAtendimento.GetDialogue());
+            Say(ErroNoAtendimento.GetDialogue(), "Carregando...");
             RequestClientDesiredService();
         }
 
@@ -149,11 +141,11 @@ public class DemandMechanics : MonoBehaviour
         if (activeClient.saldo > activeClient.valorDesejadoParaSaqueOuDeposito)
         {
             activeClient.ReduceMoodDueToBadService();
-            Say(ErroNoAtendimento.GetDialogue($"Eu pedi ${activeClient.valorDesejadoParaSaqueOuDeposito}!"));
+            Say(ErroNoAtendimento.GetDialogue($"Eu pedi ${activeClient.valorDesejadoParaSaqueOuDeposito}!"), "Carregando...");
             return;
         }
 
-        Say(DialogosDoSaque.GetDialogue(3));
+        Say(DialogosDoSaque.GetDialogue(3), "Carregando...");
 
         if (Random.Range(0, 50) < 50 && activeClient.saldo > 0)
         {
@@ -171,7 +163,7 @@ public class DemandMechanics : MonoBehaviour
     {
         //Colocar o Script para Verificação Aqui.
         activeClient.demandaAtendida = true;
-        Say("Hmmm... era isso! Gratidão!");
+        Say("Hmmm... era isso! Gratidão!", "Concluíndo Serviço...");
 
     }
 

@@ -7,11 +7,13 @@ public class MidasOS : MonoBehaviour
     private DemandMechanics clientDemandScript;
     private PCInputField pcInputField;
     private ClientCueMechanics clientCue;
+    private LoadingScreenMechanics loadingScreen;
     private PCNavigationMechanics stateNavigator;
     private Client activeClient = null;
+
     private bool clientIsIdentified = false;
     private bool clientIsAuthenticated = false;
-    bool waintingForAnimations = false;
+
     enum SelectedService
     {
         Unselected,
@@ -24,64 +26,31 @@ public class MidasOS : MonoBehaviour
 
     private SelectedService currentService;
 
-    void Start()
+    private void Start()
     {
         //Captures PC for interaction
+        loadingScreen = ScriptFinder.Get<LoadingScreenMechanics>();
         stateNavigator = GetComponent<PCNavigationMechanics>();
         pcInputField = GetComponent<PCInputField>();
         clientDemandScript = ScriptFinder.Get<DemandMechanics>();
         clientCue = ScriptFinder.Get<ClientCueMechanics>();
         dialogueGenerator = ScriptFinder.Get<DialogueGenerator>();
-        clerkFeedback = new Dialogue(Dialogue.Owner.Clerk);
 
         //Startup state for game startup
         stateNavigator.PCStateChangeAndAdvanceToStateOnTaskReturn
-            (
-            PCStateCode.Idle,
-            PCStateCode.Idle
-            );
+                (
+                PCStateCode.Idle,
+                PCStateCode.Idle
+                );
     }
 
-    private PCStateCode ConvertSelectServiceIntoPCStateCode
-    (SelectedService targetSelectedService)
+    //**************** Public Methods **********************
+ 
+    public void InputHandler(string playerInput)
     {
-        switch (targetSelectedService)
-        {
-            case SelectedService.Withdraw:
-                return PCStateCode.AwaitingWithdrawAmountInput;
+        if (loadingScreen.IsActive())
+            return;
 
-            default:
-                return PCStateCode.ChooseService;
-        }
-    }
-
-    private void StartSession()
-    {
-        dialogueGenerator.finishDialogue();
-        activeClient = clientCue.CallNextClient();
-        clientDemandScript.ClientPresentation(activeClient);
-        ChooseService();
-    }
-
-    private void EndSession()
-    {
-        ClerkFeedback("Obrigado por escolher Midas!\nCAIXA LIVRE!!!");
-        clientDemandScript.TerminarAtendimento();
-        stateNavigator.PCStateChangeAndAdvanceToStateOnTaskReturn(PCStateCode.Idle, PCStateCode.Idle);
-        clientIsIdentified = false;
-        clientIsAuthenticated = false;
-        activeClient = null;
-        stateNavigator.Clear();
-    }
-
-    private void ClerkFeedback(string clerkFeedbackText)
-    {
-        clerkFeedback.Text = clerkFeedbackText;
-        dialogueGenerator.ReceiveDialogue(clerkFeedback);
-    }
-
-    public void PCInputDistributor(string playerInput)
-    {
         switch (playerInput)
         {
             case "X":
@@ -153,6 +122,55 @@ public class MidasOS : MonoBehaviour
 
     }
 
+    public void LockPC(string standbyPopUpMessage)
+    {
+        loadingScreen.BlockScreen(standbyPopUpMessage);
+    }
+
+    public void UnlockPC()
+    {
+        loadingScreen.UnblockScreen();
+    }
+
+    //**************** Private Methods **********************
+
+    private PCStateCode ConvertServiceIntoPCStateCode(SelectedService targetSelectedService)
+    {
+        switch (targetSelectedService)
+        {
+            case SelectedService.Withdraw:
+                return PCStateCode.AwaitingWithdrawAmountInput;
+
+            default:
+                return PCStateCode.ChooseService;
+        }
+    }
+    
+    private void StartSession()
+    {
+        dialogueGenerator.FinishDialog();
+        activeClient = clientCue.CallNextClient();
+        clientDemandScript.ClientPresentation(activeClient);
+        ChooseService();
+    }
+
+    private void EndSession()
+    {
+        ClerkFeedback("Obrigado por escolher Midas!\nCAIXA LIVRE!!!", "Aguardando Cliente.");
+        clientDemandScript.TerminarAtendimento();
+        stateNavigator.PCStateChangeAndAdvanceToStateOnTaskReturn(PCStateCode.Idle, PCStateCode.Idle);
+        clientIsIdentified = false;
+        clientIsAuthenticated = false;
+        activeClient = null;
+        stateNavigator.Clear();
+    }
+
+    private void ClerkFeedback(string clerkFeedbackText, string pcStandbyMessage)
+    {
+        this.clerkFeedback = new Dialogue(Dialogue.Owner.Clerk, clerkFeedbackText, pcStandbyMessage); 
+        dialogueGenerator.ReceiveDialogue(clerkFeedback, pcStandbyMessage);
+    }
+
     private void ChooseService(string playerInput = "FirstCall")
     {
         switch (playerInput)
@@ -160,7 +178,7 @@ public class MidasOS : MonoBehaviour
             case "FirstCall":
                 if (!activeClient.demandaAtendida)
                 {
-                    ClerkFeedback("De qual Midas-Serviço você precisa?");
+                    ClerkFeedback("De qual Midas-Serviço você precisa?", "Carregando...");
                     clientDemandScript.RequestClientDesiredService();
                 }
                 stateNavigator.Clear();
@@ -179,7 +197,7 @@ public class MidasOS : MonoBehaviour
 
     private void IdentifyByBankCard()
     {
-        ClerkFeedback("Insira seu cartão por favor.");
+        ClerkFeedback("Insira seu cartão por favor.", "Aguardando Cartão do Cliente.");
         stateNavigator.PCStateChange(PCStateCode.WaitingForClientBankCard);
 
         if (clientDemandScript.RequestClientCard())
@@ -190,7 +208,7 @@ public class MidasOS : MonoBehaviour
             }
             else
             {
-                ClerkFeedback("Seu cartão está inválido! Vou precisar da usa identidade.");
+                ClerkFeedback("Seu cartão está inválido!", "Carregando...");
                 clientDemandScript.InformCardIsInvalid();
                 stateNavigator.ForgetPreviousState();
                 stateNavigator.LaunchErrorMessage(PCStateCode.ClientIDCardRequest, $"Cartão Inválido!!!\n\n\n");
@@ -198,7 +216,6 @@ public class MidasOS : MonoBehaviour
         }
         else
         {
-            ClerkFeedback("Vou precisar da usa identidade.");
             stateNavigator.PCStateChange(PCStateCode.ClientIDCardRequest);
             stateNavigator.ForgetPreviousState();
             IdentifyByIdCard();
@@ -213,7 +230,7 @@ public class MidasOS : MonoBehaviour
 
             if (!activeClient.AlreadyHandedID)
             {
-                ClerkFeedback("Preciso de sua Carteira de Identidade por favor.");
+                ClerkFeedback("Preciso de sua Carteira de Identidade por favor.", "Carregando...");
                 clientDemandScript.RequestClientIDCard();
             }
 
@@ -248,7 +265,7 @@ public class MidasOS : MonoBehaviour
         stateNavigator.PCStateChangeAndAdvanceToStateOnTaskReturn
             (
             PCStateCode.ClientIdentified,
-            ConvertSelectServiceIntoPCStateCode(currentService)
+            ConvertServiceIntoPCStateCode(currentService)
             );
     }
 
@@ -256,7 +273,7 @@ public class MidasOS : MonoBehaviour
     {
         if (playerInput == "FirstCall")
         {
-            ClerkFeedback("Insira sua senha por favor!");
+            ClerkFeedback("Insira sua senha por favor!", "Aguardando Senha...");
             stateNavigator.PCStateChange(PCStateCode.AwaitingForClientPassword);
 
             if (clientDemandScript.RequestClientPassword())
@@ -285,7 +302,7 @@ public class MidasOS : MonoBehaviour
         {
             if (!activeClient.AlreadyHandedID)
             {
-                ClerkFeedback("Preciso de sua Carteira de Identidade por favor.");
+                ClerkFeedback("Preciso de sua Carteira de Identidade por favor.", "Carregando...");
                 clientDemandScript.RequestClientIDCard();
             }
             stateNavigator.PCStateChange(PCStateCode.AwaitingMechanicalAuthenticationConfirmation);
@@ -315,7 +332,7 @@ public class MidasOS : MonoBehaviour
         stateNavigator.PCStateChangeAndAdvanceToStateOnTaskReturn
             (
             PCStateCode.ClientAutenticated,
-            ConvertSelectServiceIntoPCStateCode(currentService)
+            ConvertServiceIntoPCStateCode(currentService)
             );
     }
 
@@ -339,7 +356,7 @@ public class MidasOS : MonoBehaviour
 
         if (playerInput == "FirstCall")
         {
-            ClerkFeedback("Quanto dinheiro você quer sacar?");
+            ClerkFeedback("Quanto dinheiro você quer sacar?", "Carregando...");
             clientDemandScript.RequestWithDrawValue();
         }
 
@@ -356,7 +373,7 @@ public class MidasOS : MonoBehaviour
             else
             {
                 stateNavigator.LaunchErrorMessage(PCStateCode.AwaitingWithdrawAmountInput, "Saldo Insuficiente!");
-                ClerkFeedback($"Saldo insuficiente! Você tem {activeClient.saldo}.");
+                ClerkFeedback($"Saldo insuficiente! Você tem {activeClient.saldo}.", "Carregando...");
                 clientDemandScript.InsuficientFundForWithdraw();
                 pcInputField.Clear();
                 return;
@@ -364,17 +381,17 @@ public class MidasOS : MonoBehaviour
         }
     }
 
-    public void DepositMoney(string playerInput = "FirstCall")
+    private void DepositMoney(string playerInput = "FirstCall")
     {
 
     }
 
-    public void CashCheck(string playerInput = "FirstCall")
+    private void CashCheck(string playerInput = "FirstCall")
     {
 
     }
 
-    public void PayBill(string playerInput = "FirstCall")
+    private void PayBill(string playerInput = "FirstCall")
     {
 
     }

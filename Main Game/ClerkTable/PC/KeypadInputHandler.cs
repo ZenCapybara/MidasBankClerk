@@ -17,7 +17,7 @@ public class KeypadInputHandler : MonoBehaviour
     {
         audioSource.clip = keyboardClicks[Random.Range(0, keyboardClicks.Length)];
         audioSource.Play();
-        pcScript.PCInputDistributor(input);
+        pcScript.InputHandler(input);
     }
 
     // Update is called once per frame
