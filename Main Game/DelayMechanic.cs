@@ -7,11 +7,13 @@ public class DelayMechanic : MonoBehaviour
     private float countdown = 0;
     List<Delay> cuedDelays;
     private MidasOS pcInterface;
+    private DeliverObjectsMechanics deliverableObjects;
 
     private void Start()
     {
         cuedDelays = new List<Delay>();
         pcInterface = ScriptFinder.Get<MidasOS>();
+        deliverableObjects = ScriptFinder.Get<DeliverObjectsMechanics>();
     }
 
     /// <summary>
@@ -44,20 +46,30 @@ public class DelayMechanic : MonoBehaviour
         cuedDelays.RemoveAt(0);
         if (cuedDelays.Count == 0)
         {
-            pcInterface.UnlockPC();
+            UnlockThings();
             return;
         }
-
         StartDelay();
-
     }
 
     private void StartDelay()
     {
         if (cuedDelays[0].yieldType == YieldType.CountDown)
             countdown = cuedDelays[0].countdown;
+        LockThings();
 
+    }
+
+    private void LockThings()
+    {
         pcInterface.LockPC(cuedDelays[0].pcStandbyMessage);
+        deliverableObjects.DeliverLock();
+    }
+
+    private void UnlockThings()
+    {
+        pcInterface.UnlockPC();
+        deliverableObjects.DeliverUnlock();
     }
 
     private void Countdown()

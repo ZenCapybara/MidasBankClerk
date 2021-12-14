@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System;
+using Random = UnityEngine.Random;
 
 public class Client : MonoBehaviour
 {
@@ -6,22 +8,30 @@ public class Client : MonoBehaviour
     public int ClientObjectID { private get; set; }
 
     //ID
+    public bool ativarModoDebug;
+    public bool tmptestIsFakingInformation = false;
     private bool isFakingInformation = false;
     public string trueName { get; private set; }
     private string falseName = "";
     public string trueSurname { get; private set; }
     private string falseSurname = "";
-    public int trueAccountNumber { get; private set;  }
+    public int trueAccountNumber { get; private set; }
     private int falseAccountNumber = -1;
     public int trueIdentityNumber { get; private set; }
     private int falseIdentityNumber = -1;
     public bool AlreadyHandedID { get; private set; }
-    public int trueAge { get; private set; }
-    private int falseAge;
+    public DateTime trueBirthday { get; private set; }
+    private DateTime falseBirthday;
     public int humor { get; private set; }
     private int caution { get; set; }
+    /// <summary>
+    /// Atributos (TEST) foram adicionados para testagem do jogo. Ao retirar, necessário limpar: 1- As variáveis, 2- O método tmptest ao fim do script. 3- A chamada do método em ClientCueMechanics
+    /// </summary>
+    public bool tmptestTemCartao = true;
     public bool portaCartao { get; private set; }
+    public bool tmptestTemRG = true;
     public bool portaIdentidade { get; private set; }
+    public bool tmptestLembraSenha = true;
     public bool remembersPassword { get; private set; }
 
     enum Sex
@@ -61,7 +71,9 @@ public class Client : MonoBehaviour
         trueSurname = BancoDeNomes.GetSobrenome();
         trueIdentityNumber = Random.Range(1000000, 9999999);
         trueAccountNumber = Random.Range(1000000, 9999999);
-        trueAge = Random.Range(18, 90);
+        trueBirthday = new DateTime(DateTime.Today.Ticks);
+        falseBirthday = new DateTime(DateTime.Today.Ticks);
+        trueBirthday.AddDays(Random.Range(-27375, -6570));
         if (Random.Range(0, 100) < 80) { portaCartao = true; } else { portaCartao = false; }
         if (Random.Range(0, 100) < 80) { portaIdentidade = true; } else { portaIdentidade = false; }
         if (Random.Range(0, 100) < 80) { remembersPassword = true; } else { remembersPassword = false; }
@@ -91,7 +103,7 @@ public class Client : MonoBehaviour
                 falseSurname = robbedClient.trueSurname;
                 falseAccountNumber = robbedClient.trueAccountNumber;
                 falseIdentityNumber = robbedClient.trueIdentityNumber;
-                falseAge = robbedClient.trueAge;
+                falseBirthday = robbedClient.trueBirthday;
             }
             //forged ID
             else
@@ -108,7 +120,7 @@ public class Client : MonoBehaviour
             falseSurname = BancoDeNomes.GetSobrenome();
             falseAccountNumber = Random.Range(1000000, 9999999);
             falseIdentityNumber = Random.Range(1000000, 9999999);
-            falseAge = Random.Range(18, 90);
+            falseBirthday.AddDays(Random.Range(-27375, -6570));
         }
 
     }
@@ -163,6 +175,14 @@ public class Client : MonoBehaviour
         return trueIdentityNumber;
     }
 
+    public DateTime GetBirthday()
+    {
+        if (isFakingInformation)
+            return falseBirthday;
+
+        return trueBirthday;
+    }
+
     public void DepositMoney(int dinheiro)
     {
         saldo += dinheiro;
@@ -200,6 +220,17 @@ public class Client : MonoBehaviour
         demandaAtendida = true;
         demanda = -1;
         humor++;
+    }
+
+    public void tmptestRechargeStats()
+    {
+        if (ativarModoDebug)
+        {
+            portaCartao = tmptestTemCartao;
+            portaIdentidade = tmptestTemRG;
+            remembersPassword = tmptestLembraSenha;
+            isFakingInformation = tmptestIsFakingInformation;
+        }
     }
 
 }

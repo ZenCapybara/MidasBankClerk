@@ -1,22 +1,22 @@
 using UnityEngine;
-public class ClientIDCardMechanics : TableTopMovebleObject
+public class ClientIDCardMechanics : TableTopMovebleObject, IDeliverable
 {
     private Client activeClient;
 
     protected override void DoubleClick()
     {
-        ReturnIdToClient();
+        DeliverToClient();
     }
 
     protected override void Drop()
     {
         if (CheckIfDroppedOverClientDeliveryArea())
         {
-            ReturnIdToClient();
+            DeliverToClient();
         }
     }
 
-    void ReturnIdToClient()
+    public void DeliverToClient()
     {
         isClicked = false;
 

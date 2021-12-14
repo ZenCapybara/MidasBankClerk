@@ -12,7 +12,7 @@ public class Clickable : MonoBehaviour
 
     void Awake()
     {
-        raycaster = GameObject.Find("Canvas").GetComponent<GraphicRaycaster>();
+        raycaster = GameObject.Find("RightSideScreen").GetComponent<GraphicRaycaster>();
         eventSystem = GetComponent<EventSystem>();
     }
     

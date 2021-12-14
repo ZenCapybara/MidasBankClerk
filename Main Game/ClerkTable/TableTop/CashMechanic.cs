@@ -1,4 +1,4 @@
-﻿public class CashMechanic : TableTopMovebleObject
+﻿public class CashMechanic : TableTopMovebleObject, IDeliverable
 {
     // This var should be left public,
     // as it's value is definied in unity
@@ -27,7 +27,7 @@
 
     }
 
-    void DeliverToClient()
+    public void DeliverToClient()
     {
         activeClient = ScriptFinder.Get<ClientCueMechanics>().GetCurrentClient();
         if (activeClient == null) return;

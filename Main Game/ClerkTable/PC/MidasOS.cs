@@ -45,7 +45,7 @@ public class MidasOS : MonoBehaviour
     }
 
     //**************** Public Methods **********************
- 
+
     public void InputHandler(string playerInput)
     {
         if (loadingScreen.IsActive())
@@ -109,9 +109,14 @@ public class MidasOS : MonoBehaviour
                 break;
 
             case PCStateCode.ClientIdentified:
+                ReturnIdentifiedClient(playerInput);
                 break;
 
             case PCStateCode.OperationComplete:
+                break;
+
+            case PCStateCode.ClientAutenticated:
+                ReturnAuthenticatedClient(playerInput);
                 break;
 
             default:
@@ -145,7 +150,7 @@ public class MidasOS : MonoBehaviour
                 return PCStateCode.ChooseService;
         }
     }
-    
+
     private void StartSession()
     {
         dialogueGenerator.FinishDialog();
@@ -156,7 +161,10 @@ public class MidasOS : MonoBehaviour
 
     private void EndSession()
     {
-        ClerkFeedback("Obrigado por escolher Midas!\nCAIXA LIVRE!!!", "Aguardando Cliente.");
+        if (activeClient.demandaAtendida)
+            ClerkFeedback("Obrigado por escolher Midas! Volte Sempre!\nCAIXA LIVRE!!!", "Aguardando Cliente.");
+        else
+            ClerkFeedback("Não tenho como te ajudar. Preciso atender o próximo.\nCAIXA LIVRE!!!", "Aguardando Cliente.");
         clientDemandScript.TerminarAtendimento();
         stateNavigator.PCStateChangeAndAdvanceToStateOnTaskReturn(PCStateCode.Idle, PCStateCode.Idle);
         clientIsIdentified = false;
@@ -167,7 +175,7 @@ public class MidasOS : MonoBehaviour
 
     private void ClerkFeedback(string clerkFeedbackText, string pcStandbyMessage)
     {
-        this.clerkFeedback = new Dialogue(Dialogue.Owner.Clerk, clerkFeedbackText, pcStandbyMessage); 
+        this.clerkFeedback = new Dialogue(Dialogue.Owner.Clerk, clerkFeedbackText, pcStandbyMessage);
         dialogueGenerator.ReceiveDialogue(clerkFeedback, pcStandbyMessage);
     }
 
@@ -258,15 +266,24 @@ public class MidasOS : MonoBehaviour
         }
     }
 
-    private void ReturnIdentifiedClient()
+    private void ReturnIdentifiedClient(string playerInput = "FirstCall")
     {
-        clientIsIdentified = true;
-        stateNavigator.ForgetPreviousState();
-        stateNavigator.PCStateChangeAndAdvanceToStateOnTaskReturn
-            (
-            PCStateCode.ClientIdentified,
-            ConvertServiceIntoPCStateCode(currentService)
-            );
+        if(playerInput == "FirstCall")
+        {
+            clientIsIdentified = true;
+            stateNavigator.ForgetPreviousState();
+            stateNavigator.PCStateChangeAndAdvanceToStateOnTaskReturn
+                (
+                PCStateCode.ClientIdentified,
+                ConvertServiceIntoPCStateCode(currentService)
+                );
+        }
+        else if (playerInput == "enter")
+        {
+            InputHandler("backspace");
+            return;
+        }
+
     }
 
     private void AuthenticateClient(string playerInput = "FirstCall")
@@ -325,21 +342,30 @@ public class MidasOS : MonoBehaviour
 
     }
 
-    private void ReturnAuthenticatedClient()
+    private void ReturnAuthenticatedClient(string playerInput = "FirstCall")
     {
-        clientIsAuthenticated = true;
-        stateNavigator.ForgetPreviousState();
-        stateNavigator.PCStateChangeAndAdvanceToStateOnTaskReturn
-            (
-            PCStateCode.ClientAutenticated,
-            ConvertServiceIntoPCStateCode(currentService)
-            );
+
+        if (playerInput == "FirstCall")
+        {
+            clientIsAuthenticated = true;
+            stateNavigator.ForgetPreviousState();
+            stateNavigator.PCStateChangeAndAdvanceToStateOnTaskReturn
+                (
+                PCStateCode.ClientAutenticated,
+                ConvertServiceIntoPCStateCode(currentService)
+                );
+            return;
+        }
+        else if (playerInput == "enter")
+        {
+            InputHandler("backspace");
+            return;
+        }
     }
 
     private void WithdrawMoney(string playerInput = "FirstCall")
     {
         currentService = SelectedService.Withdraw;
-
         if (!clientIsIdentified)
         {
             IdentifyByBankCard();

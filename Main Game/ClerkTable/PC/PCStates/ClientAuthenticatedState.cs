@@ -13,6 +13,6 @@
             "\n" +
             "\n" +
             "\n" +
-            "\n ← RETORNAR.";
+            "\n APERTE 'ENTER' PARA CONTINUAR.";
     }
 }

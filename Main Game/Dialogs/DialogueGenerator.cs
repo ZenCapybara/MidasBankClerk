@@ -6,15 +6,17 @@ using static Dialogue;
 public class DialogueGenerator : MonoBehaviour
 {
     private int dialogueBoxPosition;
-    private Color clientBoxColor;
-    private Color clerkBoxColor;
     private List<Dialogue> Dialogs;
+    private Sprite clientDialogueBloonIMG;
+    private Sprite clerkDialogueBloonIMG;
     private int dialogPointer = 0;
     private DelayMechanic delayManager;
     private bool isPrinting = false;
     const float DELAY = 0.03f;
     private float printDelayCountdown = DELAY;
     private int currentLetterBeingPrinted;
+    private Button downScrollButton, upScrollButton;
+
 
     private GameObject[] dialogueBoxes;
 
@@ -22,15 +24,13 @@ public class DialogueGenerator : MonoBehaviour
     {
         Dialogs = new List<Dialogue>();
         delayManager = ScriptFinder.Get<DelayMechanic>();
-        clientBoxColor =
+        clientDialogueBloonIMG =
             GameObject.Find("TextoDeDialogo0").
-            GetComponent<Image>()
-            .color;
+            GetComponent<Image>().sprite;
 
-        clerkBoxColor =
+        clerkDialogueBloonIMG =
             GameObject.Find("TextoDeDialogo1").
-            GetComponent<Image>()
-            .color;
+            GetComponent<Image>().sprite;
 
         dialogueBoxes = new GameObject[4];
         for (int i = 0; i < 4; i++)
@@ -39,6 +39,9 @@ public class DialogueGenerator : MonoBehaviour
             dialogueBoxes[i].SetActive(false);
         }
 
+        upScrollButton = GameObject.Find("ScrollUpButton").GetComponent<Button>();
+        downScrollButton = GameObject.Find("ScrollDownButton").GetComponent<Button>();
+        LockScrollButton();
     }
 
     public void ReceiveDialogue(Dialogue inputDialogue, string delayMessage)
@@ -46,8 +49,45 @@ public class DialogueGenerator : MonoBehaviour
         delayManager.RequestDelay(delayMessage);
         Dialogs.Add(inputDialogue);
 
-        if (Dialogs.Count - 1 == dialogPointer)
+        if (!isPrinting)
+        {
+            dialogPointer = Dialogs.Count - 1;
             StartPrintingDialogue();
+        }
+
+    }
+
+    public void ScrollDialogueUp()
+    {
+        dialogPointer--;
+        ScrollDialogue();
+        UnlockScrollButton();
+    }
+
+    public void ScrollDialogueDown()
+    {
+        dialogPointer++;
+        ScrollDialogue();
+        UnlockScrollButton();
+    }
+
+    private void LockScrollButton()
+    {
+        downScrollButton.interactable = false;
+        upScrollButton.interactable = false;
+    }
+
+    private void UnlockScrollButton()
+    {
+        if (dialogPointer > 3)
+            upScrollButton.interactable = true;
+        else
+            upScrollButton.interactable = false;
+
+        if (dialogPointer < Dialogs.Count - 1)
+            downScrollButton.interactable = true;
+        else
+            downScrollButton.interactable = false;
     }
 
     public void FinishDialog()
@@ -65,6 +105,7 @@ public class DialogueGenerator : MonoBehaviour
     private void StartPrintingDialogue()
     {
         isPrinting = true;
+        LockScrollButton();
         currentLetterBeingPrinted = 0;
 
         if (dialogPointer < 4)
@@ -74,16 +115,16 @@ public class DialogueGenerator : MonoBehaviour
         }
         else
         {
-            ScrollOverflowingDialogueBoxes();
+            ScrollDialogue();
             dialogueBoxes[3].GetComponentInChildren<Text>().text = "";
             dialogueBoxPosition = 3;
         }
         ConfigureDialogueToOwnerSpecs();
     }
 
-    private void ScrollOverflowingDialogueBoxes()
+    private void ScrollDialogue()
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 4; i++)
         {
             int previousDialog = dialogPointer - 3 + i;
             dialogueBoxes[i].GetComponentInChildren<Text>().text
@@ -91,12 +132,12 @@ public class DialogueGenerator : MonoBehaviour
 
             if (Dialogs[previousDialog].MyOwner == Owner.Clerk)
             {
-                ColorDialogueBox(clerkBoxColor, dialogueBoxes[i]);
+                SetDialogueBloonImage(clerkDialogueBloonIMG, dialogueBoxes[i]);
                 //SetDialogueAlignment(Owner.Clerk, i);
             }
             else
             {
-                ColorDialogueBox(clientBoxColor, dialogueBoxes[i]);
+                SetDialogueBloonImage(clientDialogueBloonIMG, dialogueBoxes[i]);
                 //SetDialogueAlignment(Owner.Client, i);
             }
         }
@@ -107,28 +148,28 @@ public class DialogueGenerator : MonoBehaviour
     {
         if (Dialogs[dialogPointer].MyOwner == Owner.Clerk)
         {
-            ColorDialogueBox(clerkBoxColor, dialogueBoxes[dialogueBoxPosition]);
+            SetDialogueBloonImage(clerkDialogueBloonIMG, dialogueBoxes[dialogueBoxPosition]);
             //SetDialogueAlignment(Owner.Clerk, dialogueBoxPosition);
         }
         else if (Dialogs[dialogPointer].MyOwner == Owner.Client)
         {
-            ColorDialogueBox(clientBoxColor, dialogueBoxes[dialogueBoxPosition]);
+            SetDialogueBloonImage(clientDialogueBloonIMG, dialogueBoxes[dialogueBoxPosition]);
             //SetDialogueAlignment(Owner.Client, dialogueBoxPosition);
         }
     }
 
-    private void ColorDialogueBox(Color color, GameObject dialogueBox)
+    private void SetDialogueBloonImage(Sprite sprite, GameObject dialogueBox)
     {
-        if (color == clerkBoxColor)
+        if (sprite == clerkDialogueBloonIMG)
         {
-            dialogueBox.GetComponent<Image>().color = clerkBoxColor;
+            dialogueBox.GetComponent<Image>().sprite = clerkDialogueBloonIMG;
         }
         else
         {
-            dialogueBox.GetComponent<Image>().color = clientBoxColor;
+            dialogueBox.GetComponent<Image>().sprite = clientDialogueBloonIMG;
         }
     }
-    //!!! ALSO UNCOMMENT CONFIGUREDIALOGUETOOWNERSPECS AND SCROLL
+
     //private void SetDialogueAlignment(Owner owner, int dialogue)
     //{
     //    if (owner == Owner.Clerk)
@@ -150,6 +191,7 @@ public class DialogueGenerator : MonoBehaviour
         printDelayCountdown -= Time.deltaTime;
         if (printDelayCountdown > 0)
             return;
+
         if (currentLetterBeingPrinted < Dialogs[dialogPointer].Text.Length)
         {
             dialogueBoxes[dialogueBoxPosition].GetComponentInChildren<Text>().text
@@ -167,6 +209,11 @@ public class DialogueGenerator : MonoBehaviour
 
             if (dialogPointer < Dialogs.Count)
                 StartPrintingDialogue();
+            else
+            {
+                dialogPointer = Dialogs.Count - 1;
+                UnlockScrollButton();
+            }
         }
     }
 

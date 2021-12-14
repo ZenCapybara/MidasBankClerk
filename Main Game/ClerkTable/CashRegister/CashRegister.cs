@@ -6,7 +6,7 @@ public class CashRegister : MonoBehaviour
     private GameObject mesaDeAtendimento;
 
     //Para Criação das Notas no Balcão
-    public GameObject notaDeUm, notaDeCinco, notaDeDez, notaDeCinquenta;
+    public GameObject notaDeUm, notaDeDois, notaDeCinco, notaDeDez, notaDeCinquenta, notaDeCem;
     private GameObject novaNotaInstanciada;
     public static int CashBalance { get; private set; }
 
@@ -23,27 +23,27 @@ public class CashRegister : MonoBehaviour
         {
             case "1":
                 novaNotaInstanciada = Instantiate(notaDeUm, mesaDeAtendimento.gameObject.transform);
-                novaNotaInstanciada.transform.Rotate(0, 0, Random.Range(-20, 20));
-                novaNotaInstanciada.transform.position += new Vector3(Random.Range(-150, 150), 0);
+                break;
+            case "2":
+                novaNotaInstanciada = Instantiate(notaDeDois, mesaDeAtendimento.gameObject.transform);
                 break;
             case "5":
                 novaNotaInstanciada = Instantiate(notaDeCinco, mesaDeAtendimento.gameObject.transform);
-                novaNotaInstanciada.transform.Rotate(0, 0, Random.Range(-20, 20));
-                novaNotaInstanciada.transform.position += new Vector3(Random.Range(-150, 150), 0);
                 break;
             case "10":
                 novaNotaInstanciada = Instantiate(notaDeDez, mesaDeAtendimento.gameObject.transform);
-                novaNotaInstanciada.transform.Rotate(0, 0, Random.Range(-20, 20));
-                novaNotaInstanciada.transform.position += new Vector3(Random.Range(-150, 150), 0);
                 break;
             case "50":
                 novaNotaInstanciada = Instantiate(notaDeCinquenta, mesaDeAtendimento.gameObject.transform);
-                novaNotaInstanciada.transform.Rotate(0, 0, Random.Range(-20, 20));
-                novaNotaInstanciada.transform.position += new Vector3(Random.Range(-150, 150), 0);
+                break;
+            case "100":
+                novaNotaInstanciada = Instantiate(notaDeCem, mesaDeAtendimento.gameObject.transform);
                 break;
             default:
                 break;
         }
+        // -> Uncomment if Regina decides the objects should be tilted on the table. // novaNotaInstanciada.transform.Rotate(0, 0, Random.Range(-20, 20));
+        novaNotaInstanciada.transform.position += new Vector3(Random.Range(-125, 150), Random.Range(-225, 25));
     }
 
     public static void AddOrTakeFromCashBalance(int cashVariation)

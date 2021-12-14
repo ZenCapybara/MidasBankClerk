@@ -19,9 +19,9 @@ public class ClientIdentifiedState : PCState
                    $"\nNome: {accountOwnerInfo.trueName} {accountOwnerInfo.trueSurname}" +
                    $"\nNº da Conta: {accountOwnerInfo.trueAccountNumber}" +
                    $"\nRG: {accountOwnerInfo.trueIdentityNumber}" +
-                   $"\nIdade: {accountOwnerInfo.trueAge}" +
+                   $"\nIdade: {accountOwnerInfo.trueBirthday}" +
                    $"\nSaldo: {accountOwnerInfo.saldo},00" +
-                   $"\n\n<- Retornar";
+                   $"\n\nAPERTE 'ENTER' PARA CONTINUAR.";
         }
         else
         {
@@ -31,7 +31,7 @@ public class ClientIdentifiedState : PCState
                    $"\n" +
                    $"\n" +
                    $"\n" +
-                   $"\n\n<- Retornar";
+                   $"\n\nAPERTE 'ENTER' PARA CONTINUAR.";
         }
 
     }

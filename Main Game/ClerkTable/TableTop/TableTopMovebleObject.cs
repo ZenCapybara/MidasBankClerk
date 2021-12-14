@@ -5,6 +5,7 @@ public abstract class TableTopMovebleObject : Clickable
     protected bool isClicked = false;
     protected float timeWhenLastClicked = 0;
     protected float leftLimit, rightLimit, topLimit, botLimit;
+    protected Vector3 mousePositionTracker;
     
     public TableTopMovebleObject()
     {
@@ -17,6 +18,7 @@ public abstract class TableTopMovebleObject : Clickable
             return;
 
         isClicked = true;
+        mousePositionTracker = Input.mousePosition;
 
         transform.SetAsLastSibling();
 
@@ -42,35 +44,39 @@ public abstract class TableTopMovebleObject : Clickable
 
     protected void Drag()
     {
-        if (CheckIfPositionIsValid().PositionX)
+
+        Vector3 mouseDisplacement = Input.mousePosition - mousePositionTracker;
+        mousePositionTracker = Input.mousePosition;
+
+        if (CheckIfPositionIsValid(mouseDisplacement).PositionX)
         {
             transform.position = new Vector3
                 (
-                Input.mousePosition.x,
+                transform.position.x + mouseDisplacement.x,
                 transform.position.y,
                 0
                 );
         }
 
-        if (CheckIfPositionIsValid().PositionY)
+        if (CheckIfPositionIsValid(mouseDisplacement).PositionY)
         {
             transform.position = new Vector3
                 (
                 transform.position.x,
-                Input.mousePosition.y,
+                transform.position.y + mouseDisplacement.y,
                 0
                 );
         }
     }
 
-    protected (bool PositionX, bool PositionY) CheckIfPositionIsValid()
+    protected (bool PositionX, bool PositionY) CheckIfPositionIsValid(Vector3 displacement)
     {
         return (
-            Input.mousePosition.x > leftLimit 
-            && Input.mousePosition.x < rightLimit,
+            transform.position.x + displacement.x > leftLimit 
+            && transform.position.x + displacement.x < rightLimit,
 
-            Input.mousePosition.y < topLimit 
-            && Input.mousePosition.y > botLimit
+            transform.position.y + displacement.y < topLimit 
+            && transform.position.y + displacement.y > botLimit
             );
     }
 

@@ -13,6 +13,7 @@ public class ClientCueMechanics : MonoBehaviour
     {
         senhaAtual++;
         if(senhaAtual == 100) senhaAtual = 0; // linha temporária enquanto o número de clientes é finito e o tempo não passa.
+        filaDeClientes[senhaAtual].tmptestRechargeStats();
         return filaDeClientes[senhaAtual];
     }
 
@@ -60,10 +61,13 @@ public class ClientCueMechanics : MonoBehaviour
         //
         senhaAtual = -1;
         //Inicia Fila de Clientes
+        Transform clientCueObject = GameObject.Find("ClientCue").transform;
         for (int i = 0; i < 100; i++)
         {
             filaDeClientes.Add(Instantiate(clientPrefab).GetComponent<Client>());
             filaDeClientes[i].ClientObjectID = i;
+            filaDeClientes[i].name = $"Cliente {i}";
+            filaDeClientes[i].transform.SetParent(clientCueObject);
         }
     }
 

@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 public class DemandMechanics : MonoBehaviour
 {
@@ -8,17 +7,17 @@ public class DemandMechanics : MonoBehaviour
     private DialogueGenerator outputDialogue;
     private Client activeClient;
     private Dialogue clientDialogue;
-    private GameObject clientHandoverObjectPanel;
-    private Text clientDeliveredObjectDescription;
+    private DeliverObjectsMechanics clientObjectHandler;
+    //private GameObject clientHandoverObjectPanel;
 
     void Start()
     {
         outputDialogue = ScriptFinder.Get<DialogueGenerator>();
+        clientObjectHandler = ScriptFinder.Get<DeliverObjectsMechanics>();
 
         //Capture Client Object Description Box (placeholder for actual object art)
-        clientHandoverObjectPanel = GameObject.Find("ClientIDCard");
-        clientDeliveredObjectDescription = clientHandoverObjectPanel.GetComponentInChildren<Text>();
-        clientHandoverObjectPanel.SetActive(false);
+        //clientHandoverObjectPanel = GameObject.Find("ClientIDCard");
+        //clientHandoverObjectPanel.SetActive(false);
 
     }
 
@@ -36,8 +35,8 @@ public class DemandMechanics : MonoBehaviour
         {
             activeClient.ReduceMoodDueToBadService(10);
         }
-        clientHandoverObjectPanel.SetActive(false);
         Say(DialogoDemandaConcluida.GetDialogo(activeClient.humor), "Concluíndo Atendimento...");
+        clientObjectHandler.ClearTable();
     }
 
     public void ClientPresentation(Client nextClient)
@@ -86,12 +85,7 @@ public class DemandMechanics : MonoBehaviour
 
     private void PresentID()
     {
-        clientHandoverObjectPanel.SetActive(true);
-        clientHandoverObjectPanel.transform.rotation = Quaternion.Euler(0, 0, Random.Range(0, 25));
-        clientDeliveredObjectDescription.text =
-            $"CARTEIRA DE IDENTIDADE\n\n" +
-            $"NOME: {activeClient.GetName()}\n" +
-            $"RG: {activeClient.trueIdentityNumber}";
+        clientObjectHandler.PresentID(activeClient);
     }
 
     public bool RequestClientIDCard()
@@ -150,7 +144,6 @@ public class DemandMechanics : MonoBehaviour
         if (Random.Range(0, 50) < 50 && activeClient.saldo > 0)
         {
             activeClient.SetValorDesejadoParaSaqueOuDeposito();
-            RequestWithDrawValue();
         }
         else
         {

@@ -18,7 +18,7 @@
          $"\nNome: {accountOwnerInfo.trueName} {accountOwnerInfo.trueSurname}" +
          $"\nNº da Conta: {accountOwnerInfo.trueAccountNumber}" +
          $"\nRG: {accountOwnerInfo.trueIdentityNumber}" +
-         $"\nIdade: {accountOwnerInfo.trueAge}" +
+         $"\nIdade: {accountOwnerInfo.trueBirthday}" +
          $"\n" +
          "\n ← RETORNAR.";
     }
